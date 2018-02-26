@@ -1,0 +1,709 @@
+op {
+  output: "db"
+  type: "CreateDB"
+  arg {
+    name: "db_type"
+    s: "lmdb"
+  }
+  arg {
+    name: "db"
+    s: "./dataset"
+  }
+}
+op {
+  output: "LSTM1/seq_lengths"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 80
+  }
+  arg {
+    name: "value"
+    i: 25
+  }
+  arg {
+    name: "dtype"
+    i: 2
+  }
+}
+op {
+  output: "LSTM1/i2h_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 400
+    ints: 4
+  }
+}
+op {
+  output: "LSTM1/i2h_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+}
+op {
+  output: "LSTM1/gates_t_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 400
+    ints: 100
+  }
+}
+op {
+  output: "LSTM1/gates_t_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+}
+op {
+  output: "LSTM1/hidden_init"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+}
+op {
+  output: "LSTM1/cell_init"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+}
+op {
+  output: "LSTM2/seq_lengths"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 80
+  }
+  arg {
+    name: "value"
+    i: 25
+  }
+  arg {
+    name: "dtype"
+    i: 2
+  }
+}
+op {
+  output: "LSTM2/i2h_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 400
+    ints: 100
+  }
+}
+op {
+  output: "LSTM2/i2h_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+}
+op {
+  output: "LSTM2/gates_t_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 400
+    ints: 100
+  }
+}
+op {
+  output: "LSTM2/gates_t_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+}
+op {
+  output: "LSTM2/hidden_init"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+}
+op {
+  output: "LSTM2/cell_init"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+}
+op {
+  output: "fc1_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 50
+    ints: 100
+  }
+}
+op {
+  output: "fc1_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 50
+  }
+}
+op {
+  output: "fc2_w"
+  type: "XavierFill"
+  arg {
+    name: "shape"
+    ints: 10
+    ints: 50
+  }
+}
+op {
+  output: "fc2_b"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 10
+  }
+}
+op {
+  output: "iter"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 1
+  }
+  arg {
+    name: "value"
+    i: 0
+  }
+  arg {
+    name: "dtype"
+    i: 10
+  }
+  device_option {
+    device_type: 0
+  }
+}
+op {
+  output: "LSTM1/i2h_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 1600
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/i2h_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 1600
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/i2h_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/i2h_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/hidden_init_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/hidden_init_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/cell_init_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/cell_init_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/gates_t_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/gates_t_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/gates_t_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM1/gates_t_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/i2h_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/i2h_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/i2h_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/i2h_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/hidden_init_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/hidden_init_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/cell_init_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/cell_init_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 100
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/gates_t_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/gates_t_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 40000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/gates_t_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "LSTM2/gates_t_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 400
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc1_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 5000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc1_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 5000
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc1_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 50
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc1_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 50
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc2_w_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 500
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc2_w_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 500
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc2_b_moment_1"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 10
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}
+op {
+  output: "fc2_b_moment_2"
+  type: "ConstantFill"
+  arg {
+    name: "shape"
+    ints: 10
+  }
+  arg {
+    name: "value"
+    f: 0
+  }
+  arg {
+    name: "dtype"
+    i: 1
+  }
+}

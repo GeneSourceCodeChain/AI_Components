@@ -1,0 +1,963 @@
+op {
+  input: "db"
+  output: "data"
+  output: "label"
+  type: "TensorProtosDBInput"
+  arg {
+    name: "batch_size"
+    i: 80
+  }
+}
+op {
+  input: "data"
+  output: "data_transposed"
+  type: "Transpose"
+  arg {
+    name: "axes"
+    ints: 1
+    ints: 0
+    ints: 2
+  }
+}
+op {
+  input: "data_transposed"
+  input: "LSTM1/i2h_w"
+  input: "LSTM1/i2h_b"
+  output: "LSTM1/i2h"
+  type: "FC"
+}
+op {
+  input: "LSTM1/i2h"
+  input: "LSTM1/hidden_init"
+  input: "LSTM1/cell_init"
+  input: "LSTM1/gates_t_w"
+  input: "LSTM1/gates_t_b"
+  input: "LSTM1/seq_lengths"
+  output: "LSTM1/hidden_t_all"
+  output: "LSTM1/hidden_state"
+  output: "LSTM1/cell_t_all"
+  output: "LSTM1/cell_state"
+  output: "LSTM1/step_workspaces"
+  type: "RecurrentNetwork"
+  arg {
+    name: "outputs_with_grads"
+    ints: 0
+  }
+  arg {
+    name: "link_internal"
+    strings: "LSTM1/hidden_t_prev"
+    strings: "LSTM1/hidden_t"
+    strings: "LSTM1/cell_t_prev"
+    strings: "LSTM1/cell_t"
+    strings: "input_t"
+  }
+  arg {
+    name: "alias_dst"
+    strings: "LSTM1/hidden_t_all"
+    strings: "LSTM1/hidden_state"
+    strings: "LSTM1/cell_t_all"
+    strings: "LSTM1/cell_state"
+  }
+  arg {
+    name: "recompute_blobs_on_backward"
+  }
+  arg {
+    name: "timestep"
+    s: "timestep"
+  }
+  arg {
+    name: "backward_link_external"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/cell_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/cell_t_prev_states_grad"
+    strings: "LSTM1/i2h_grad"
+  }
+  arg {
+    name: "link_external"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/i2h"
+  }
+  arg {
+    name: "link_offset"
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+  }
+  arg {
+    name: "alias_offset"
+    ints: 1
+    ints: -1
+    ints: 1
+    ints: -1
+  }
+  arg {
+    name: "recurrent_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+  }
+  arg {
+    name: "backward_link_offset"
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 0
+  }
+  arg {
+    name: "param_grads"
+    strings: "LSTM1/gates_t_w_grad"
+    strings: "LSTM1/gates_t_b_grad"
+  }
+  arg {
+    name: "backward_link_internal"
+    strings: "LSTM1/hidden_t_grad"
+    strings: "LSTM1/hidden_t_prev_grad"
+    strings: "LSTM1/cell_t_grad"
+    strings: "LSTM1/cell_t_prev_grad"
+    strings: "LSTM1/gates_t_grad"
+  }
+  arg {
+    name: "param"
+    ints: 3
+    ints: 4
+  }
+  arg {
+    name: "step_net"
+    s: "name: \"LSTM1\"\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/gates_t_w\"\n  input: \"LSTM1/gates_t_b\"\n  output: \"LSTM1/gates_t\"\n  type: \"FC\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n}\nop {\n  input: \"LSTM1/gates_t\"\n  input: \"input_t\"\n  output: \"LSTM1/gates_t\"\n  type: \"Sum\"\n  device_option {\n    device_type: 1\n  }\n}\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/cell_t_prev\"\n  input: \"LSTM1/gates_t\"\n  input: \"LSTM1/seq_lengths\"\n  input: \"timestep\"\n  output: \"LSTM1/hidden_t\"\n  output: \"LSTM1/cell_t\"\n  type: \"LSTMUnit\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n}\ntype: \"rnn\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM1/hidden_t_prev\"\nexternal_input: \"LSTM1/cell_t_prev\"\nexternal_input: \"LSTM1/gates_t_w\"\nexternal_input: \"LSTM1/gates_t_b\"\nexternal_input: \"LSTM1/seq_lengths\"\nexternal_output: \"LSTM1/hidden_t\"\nexternal_output: \"LSTM1/cell_t\"\n"
+  }
+  arg {
+    name: "backward_step_net"
+    s: "name: \"RecurrentBackwardStep\"\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/cell_t_prev\"\n  input: \"LSTM1/gates_t\"\n  input: \"LSTM1/seq_lengths\"\n  input: \"timestep\"\n  input: \"LSTM1/hidden_t\"\n  input: \"LSTM1/cell_t\"\n  input: \"LSTM1/hidden_t_grad\"\n  input: \"LSTM1/cell_t_grad\"\n  output: \"LSTM1/hidden_t_prev_grad\"\n  output: \"LSTM1/cell_t_prev_grad\"\n  output: \"LSTM1/gates_t_grad\"\n  name: \"\"\n  type: \"LSTMUnitGradient\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/gates_t_w\"\n  input: \"LSTM1/gates_t_grad\"\n  output: \"LSTM1/gates_t_w_grad\"\n  output: \"LSTM1/gates_t_b_grad\"\n  output: \"LSTM1/hidden_t_prev_grad_split\"\n  name: \"\"\n  type: \"FCGradient\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM1/hidden_t_prev_grad\"\n  input: \"LSTM1/hidden_t_prev_grad_split\"\n  output: \"LSTM1/hidden_t_prev_grad\"\n  type: \"Sum\"\n}\ntype: \"simple\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"LSTM1/gates_t\"\nexternal_input: \"LSTM1/hidden_t_grad\"\nexternal_input: \"LSTM1/cell_t_grad\"\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM1/hidden_t_prev\"\nexternal_input: \"LSTM1/cell_t_prev\"\nexternal_input: \"LSTM1/gates_t_w\"\nexternal_input: \"LSTM1/gates_t_b\"\nexternal_input: \"LSTM1/seq_lengths\"\nexternal_input: \"LSTM1/hidden_t\"\nexternal_input: \"LSTM1/cell_t\"\n"
+  }
+  arg {
+    name: "alias_src"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+  }
+  arg {
+    name: "initial_recurrent_state_ids"
+    ints: 1
+    ints: 2
+  }
+}
+op {
+  input: "LSTM1/hidden_state"
+  output: "LSTM1/hidden_init"
+  type: "Copy"
+}
+op {
+  input: "LSTM1/cell_state"
+  output: "LSTM1/cell_init"
+  type: "Copy"
+}
+op {
+  input: "LSTM1/hidden_t_all"
+  input: "LSTM2/i2h_w"
+  input: "LSTM2/i2h_b"
+  output: "LSTM2/i2h"
+  type: "FC"
+}
+op {
+  input: "LSTM2/i2h"
+  input: "LSTM2/hidden_init"
+  input: "LSTM2/cell_init"
+  input: "LSTM2/gates_t_w"
+  input: "LSTM2/gates_t_b"
+  input: "LSTM2/seq_lengths"
+  output: "LSTM2/hidden_t_all"
+  output: "LSTM2/hidden_state"
+  output: "LSTM2/cell_t_all"
+  output: "LSTM2/cell_state"
+  output: "LSTM2/step_workspaces"
+  type: "RecurrentNetwork"
+  arg {
+    name: "outputs_with_grads"
+    ints: 0
+  }
+  arg {
+    name: "link_internal"
+    strings: "LSTM2/hidden_t_prev"
+    strings: "LSTM2/hidden_t"
+    strings: "LSTM2/cell_t_prev"
+    strings: "LSTM2/cell_t"
+    strings: "input_t"
+  }
+  arg {
+    name: "alias_dst"
+    strings: "LSTM2/hidden_t_all"
+    strings: "LSTM2/hidden_state"
+    strings: "LSTM2/cell_t_all"
+    strings: "LSTM2/cell_state"
+  }
+  arg {
+    name: "recompute_blobs_on_backward"
+  }
+  arg {
+    name: "timestep"
+    s: "timestep"
+  }
+  arg {
+    name: "backward_link_external"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/cell_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/cell_t_prev_states_grad"
+    strings: "LSTM2/i2h_grad"
+  }
+  arg {
+    name: "link_external"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/i2h"
+  }
+  arg {
+    name: "link_offset"
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+  }
+  arg {
+    name: "alias_offset"
+    ints: 1
+    ints: -1
+    ints: 1
+    ints: -1
+  }
+  arg {
+    name: "recurrent_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+  }
+  arg {
+    name: "backward_link_offset"
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 0
+  }
+  arg {
+    name: "param_grads"
+    strings: "LSTM2/gates_t_w_grad"
+    strings: "LSTM2/gates_t_b_grad"
+  }
+  arg {
+    name: "backward_link_internal"
+    strings: "LSTM2/hidden_t_grad"
+    strings: "LSTM2/hidden_t_prev_grad"
+    strings: "LSTM2/cell_t_grad"
+    strings: "LSTM2/cell_t_prev_grad"
+    strings: "LSTM2/gates_t_grad"
+  }
+  arg {
+    name: "param"
+    ints: 3
+    ints: 4
+  }
+  arg {
+    name: "step_net"
+    s: "name: \"LSTM2\"\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/gates_t_w\"\n  input: \"LSTM2/gates_t_b\"\n  output: \"LSTM2/gates_t\"\n  type: \"FC\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n}\nop {\n  input: \"LSTM2/gates_t\"\n  input: \"input_t\"\n  output: \"LSTM2/gates_t\"\n  type: \"Sum\"\n  device_option {\n    device_type: 1\n  }\n}\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/cell_t_prev\"\n  input: \"LSTM2/gates_t\"\n  input: \"LSTM2/seq_lengths\"\n  input: \"timestep\"\n  output: \"LSTM2/hidden_t\"\n  output: \"LSTM2/cell_t\"\n  type: \"LSTMUnit\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n}\ntype: \"rnn\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM2/hidden_t_prev\"\nexternal_input: \"LSTM2/cell_t_prev\"\nexternal_input: \"LSTM2/gates_t_w\"\nexternal_input: \"LSTM2/gates_t_b\"\nexternal_input: \"LSTM2/seq_lengths\"\nexternal_output: \"LSTM2/hidden_t\"\nexternal_output: \"LSTM2/cell_t\"\n"
+  }
+  arg {
+    name: "backward_step_net"
+    s: "name: \"RecurrentBackwardStep\"\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/cell_t_prev\"\n  input: \"LSTM2/gates_t\"\n  input: \"LSTM2/seq_lengths\"\n  input: \"timestep\"\n  input: \"LSTM2/hidden_t\"\n  input: \"LSTM2/cell_t\"\n  input: \"LSTM2/hidden_t_grad\"\n  input: \"LSTM2/cell_t_grad\"\n  output: \"LSTM2/hidden_t_prev_grad\"\n  output: \"LSTM2/cell_t_prev_grad\"\n  output: \"LSTM2/gates_t_grad\"\n  name: \"\"\n  type: \"LSTMUnitGradient\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/gates_t_w\"\n  input: \"LSTM2/gates_t_grad\"\n  output: \"LSTM2/gates_t_w_grad\"\n  output: \"LSTM2/gates_t_b_grad\"\n  output: \"LSTM2/hidden_t_prev_grad_split\"\n  name: \"\"\n  type: \"FCGradient\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM2/hidden_t_prev_grad\"\n  input: \"LSTM2/hidden_t_prev_grad_split\"\n  output: \"LSTM2/hidden_t_prev_grad\"\n  type: \"Sum\"\n}\ntype: \"simple\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"LSTM2/gates_t\"\nexternal_input: \"LSTM2/hidden_t_grad\"\nexternal_input: \"LSTM2/cell_t_grad\"\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM2/hidden_t_prev\"\nexternal_input: \"LSTM2/cell_t_prev\"\nexternal_input: \"LSTM2/gates_t_w\"\nexternal_input: \"LSTM2/gates_t_b\"\nexternal_input: \"LSTM2/seq_lengths\"\nexternal_input: \"LSTM2/hidden_t\"\nexternal_input: \"LSTM2/cell_t\"\n"
+  }
+  arg {
+    name: "alias_src"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+  }
+  arg {
+    name: "initial_recurrent_state_ids"
+    ints: 1
+    ints: 2
+  }
+}
+op {
+  input: "LSTM2/hidden_state"
+  output: "LSTM2/hidden_init"
+  type: "Copy"
+}
+op {
+  input: "LSTM2/cell_state"
+  output: "LSTM2/cell_init"
+  type: "Copy"
+}
+op {
+  input: "LSTM2/hidden_state"
+  input: "fc1_w"
+  input: "fc1_b"
+  output: "fc1"
+  type: "FC"
+}
+op {
+  input: "fc1"
+  input: "fc2_w"
+  input: "fc2_b"
+  output: "fc2"
+  type: "FC"
+}
+op {
+  input: "fc2"
+  input: "label"
+  output: "softmax"
+  output: "loss"
+  type: "SoftmaxWithLoss"
+}
+op {
+  input: "loss"
+  output: "loss_grad"
+  type: "ConstantFill"
+  arg {
+    name: "value"
+    f: 1
+  }
+}
+op {
+  input: "fc2"
+  input: "label"
+  input: "softmax"
+  input: "loss_grad"
+  output: "fc2_grad"
+  name: ""
+  type: "SoftmaxWithLossGradient"
+  is_gradient_op: true
+}
+op {
+  input: "fc1"
+  input: "fc2_w"
+  input: "fc2_grad"
+  output: "fc2_w_grad"
+  output: "fc2_b_grad"
+  output: "fc1_grad"
+  name: ""
+  type: "FCGradient"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM2/hidden_state"
+  input: "fc1_w"
+  input: "fc1_grad"
+  output: "fc1_w_grad"
+  output: "fc1_b_grad"
+  output: "LSTM2/hidden_state_grad_sum_1"
+  name: ""
+  type: "FCGradient"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM2/cell_init_grad"
+  input: "LSTM2/cell_state"
+  output: "LSTM2/cell_state_grad"
+  name: ""
+  type: "CopyOnDeviceLike"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM2/hidden_init_grad"
+  input: "LSTM2/hidden_state"
+  output: "LSTM2/hidden_state_grad_sum_0"
+  name: ""
+  type: "CopyOnDeviceLike"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM2/hidden_state_grad_sum_0"
+  input: "LSTM2/hidden_state_grad_sum_1"
+  output: "LSTM2/hidden_state_grad"
+  type: "Sum"
+}
+op {
+  input: "LSTM2/hidden_t_all_grad"
+  input: "LSTM2/i2h"
+  input: "LSTM2/hidden_init"
+  input: "LSTM2/cell_init"
+  input: "LSTM2/gates_t_w"
+  input: "LSTM2/gates_t_b"
+  input: "LSTM2/seq_lengths"
+  input: "LSTM2/hidden_t_all"
+  input: "LSTM2/hidden_state"
+  input: "LSTM2/cell_t_all"
+  input: "LSTM2/cell_state"
+  input: "LSTM2/step_workspaces"
+  output: "LSTM2/i2h_grad"
+  output: "LSTM2/gates_t_w_grad"
+  output: "LSTM2/gates_t_b_grad"
+  output: "LSTM2/hidden_init_grad"
+  output: "LSTM2/cell_init_grad"
+  name: ""
+  type: "RecurrentNetworkGradient"
+  arg {
+    name: "outputs_with_grads"
+    ints: 0
+  }
+  arg {
+    name: "link_internal"
+    strings: "LSTM2/hidden_t_prev"
+    strings: "LSTM2/hidden_t"
+    strings: "LSTM2/cell_t_prev"
+    strings: "LSTM2/cell_t"
+    strings: "input_t"
+  }
+  arg {
+    name: "alias_dst"
+    strings: "LSTM2/hidden_t_all"
+    strings: "LSTM2/hidden_state"
+    strings: "LSTM2/cell_t_all"
+    strings: "LSTM2/cell_state"
+  }
+  arg {
+    name: "recompute_blobs_on_backward"
+  }
+  arg {
+    name: "timestep"
+    s: "timestep"
+  }
+  arg {
+    name: "backward_link_external"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/cell_t_prev_states_grad"
+    strings: "LSTM2/LSTM2/cell_t_prev_states_grad"
+    strings: "LSTM2/i2h_grad"
+  }
+  arg {
+    name: "link_external"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/i2h"
+  }
+  arg {
+    name: "link_offset"
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+  }
+  arg {
+    name: "alias_offset"
+    ints: 1
+    ints: -1
+    ints: 1
+    ints: -1
+  }
+  arg {
+    name: "recurrent_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+  }
+  arg {
+    name: "backward_link_offset"
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 0
+  }
+  arg {
+    name: "param_grads"
+    strings: "LSTM2/gates_t_w_grad"
+    strings: "LSTM2/gates_t_b_grad"
+  }
+  arg {
+    name: "backward_link_internal"
+    strings: "LSTM2/hidden_t_grad"
+    strings: "LSTM2/hidden_t_prev_grad"
+    strings: "LSTM2/cell_t_grad"
+    strings: "LSTM2/cell_t_prev_grad"
+    strings: "LSTM2/gates_t_grad"
+  }
+  arg {
+    name: "param"
+    ints: 3
+    ints: 4
+  }
+  arg {
+    name: "step_net"
+    s: "name: \"LSTM2\"\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/gates_t_w\"\n  input: \"LSTM2/gates_t_b\"\n  output: \"LSTM2/gates_t\"\n  type: \"FC\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n}\nop {\n  input: \"LSTM2/gates_t\"\n  input: \"input_t\"\n  output: \"LSTM2/gates_t\"\n  type: \"Sum\"\n  device_option {\n    device_type: 1\n  }\n}\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/cell_t_prev\"\n  input: \"LSTM2/gates_t\"\n  input: \"LSTM2/seq_lengths\"\n  input: \"timestep\"\n  output: \"LSTM2/hidden_t\"\n  output: \"LSTM2/cell_t\"\n  type: \"LSTMUnit\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n}\ntype: \"rnn\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM2/hidden_t_prev\"\nexternal_input: \"LSTM2/cell_t_prev\"\nexternal_input: \"LSTM2/gates_t_w\"\nexternal_input: \"LSTM2/gates_t_b\"\nexternal_input: \"LSTM2/seq_lengths\"\nexternal_output: \"LSTM2/hidden_t\"\nexternal_output: \"LSTM2/cell_t\"\n"
+  }
+  arg {
+    name: "backward_step_net"
+    s: "name: \"RecurrentBackwardStep\"\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/cell_t_prev\"\n  input: \"LSTM2/gates_t\"\n  input: \"LSTM2/seq_lengths\"\n  input: \"timestep\"\n  input: \"LSTM2/hidden_t\"\n  input: \"LSTM2/cell_t\"\n  input: \"LSTM2/hidden_t_grad\"\n  input: \"LSTM2/cell_t_grad\"\n  output: \"LSTM2/hidden_t_prev_grad\"\n  output: \"LSTM2/cell_t_prev_grad\"\n  output: \"LSTM2/gates_t_grad\"\n  name: \"\"\n  type: \"LSTMUnitGradient\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM2/hidden_t_prev\"\n  input: \"LSTM2/gates_t_w\"\n  input: \"LSTM2/gates_t_grad\"\n  output: \"LSTM2/gates_t_w_grad\"\n  output: \"LSTM2/gates_t_b_grad\"\n  output: \"LSTM2/hidden_t_prev_grad_split\"\n  name: \"\"\n  type: \"FCGradient\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM2/hidden_t_prev_grad\"\n  input: \"LSTM2/hidden_t_prev_grad_split\"\n  output: \"LSTM2/hidden_t_prev_grad\"\n  type: \"Sum\"\n}\ntype: \"simple\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"LSTM2/gates_t\"\nexternal_input: \"LSTM2/hidden_t_grad\"\nexternal_input: \"LSTM2/cell_t_grad\"\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM2/hidden_t_prev\"\nexternal_input: \"LSTM2/cell_t_prev\"\nexternal_input: \"LSTM2/gates_t_w\"\nexternal_input: \"LSTM2/gates_t_b\"\nexternal_input: \"LSTM2/seq_lengths\"\nexternal_input: \"LSTM2/hidden_t\"\nexternal_input: \"LSTM2/cell_t\"\n"
+  }
+  arg {
+    name: "alias_src"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/hidden_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+    strings: "LSTM2/LSTM2/cell_t_prev_states"
+  }
+  arg {
+    name: "initial_recurrent_state_ids"
+    ints: 1
+    ints: 2
+  }
+  is_gradient_op: true
+}
+op {
+  input: "LSTM1/hidden_t_all"
+  input: "LSTM2/i2h_w"
+  input: "LSTM2/i2h_grad"
+  output: "LSTM2/i2h_w_grad"
+  output: "LSTM2/i2h_b_grad"
+  output: "LSTM1/hidden_t_all_grad"
+  name: ""
+  type: "FCGradient"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM1/cell_init_grad"
+  input: "LSTM1/cell_state"
+  output: "LSTM1/cell_state_grad"
+  name: ""
+  type: "CopyOnDeviceLike"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM1/hidden_init_grad"
+  input: "LSTM1/hidden_state"
+  output: "LSTM1/hidden_state_grad"
+  name: ""
+  type: "CopyOnDeviceLike"
+  is_gradient_op: true
+}
+op {
+  input: "LSTM1/hidden_t_all_grad"
+  input: "LSTM1/i2h"
+  input: "LSTM1/hidden_init"
+  input: "LSTM1/cell_init"
+  input: "LSTM1/gates_t_w"
+  input: "LSTM1/gates_t_b"
+  input: "LSTM1/seq_lengths"
+  input: "LSTM1/hidden_t_all"
+  input: "LSTM1/hidden_state"
+  input: "LSTM1/cell_t_all"
+  input: "LSTM1/cell_state"
+  input: "LSTM1/step_workspaces"
+  output: "LSTM1/i2h_grad"
+  output: "LSTM1/gates_t_w_grad"
+  output: "LSTM1/gates_t_b_grad"
+  output: "LSTM1/hidden_init_grad"
+  output: "LSTM1/cell_init_grad"
+  name: ""
+  type: "RecurrentNetworkGradient"
+  arg {
+    name: "outputs_with_grads"
+    ints: 0
+  }
+  arg {
+    name: "link_internal"
+    strings: "LSTM1/hidden_t_prev"
+    strings: "LSTM1/hidden_t"
+    strings: "LSTM1/cell_t_prev"
+    strings: "LSTM1/cell_t"
+    strings: "input_t"
+  }
+  arg {
+    name: "alias_dst"
+    strings: "LSTM1/hidden_t_all"
+    strings: "LSTM1/hidden_state"
+    strings: "LSTM1/cell_t_all"
+    strings: "LSTM1/cell_state"
+  }
+  arg {
+    name: "recompute_blobs_on_backward"
+  }
+  arg {
+    name: "timestep"
+    s: "timestep"
+  }
+  arg {
+    name: "backward_link_external"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/cell_t_prev_states_grad"
+    strings: "LSTM1/LSTM1/cell_t_prev_states_grad"
+    strings: "LSTM1/i2h_grad"
+  }
+  arg {
+    name: "link_external"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/i2h"
+  }
+  arg {
+    name: "link_offset"
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+  }
+  arg {
+    name: "alias_offset"
+    ints: 1
+    ints: -1
+    ints: 1
+    ints: -1
+  }
+  arg {
+    name: "recurrent_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+  }
+  arg {
+    name: "backward_link_offset"
+    ints: 1
+    ints: 0
+    ints: 1
+    ints: 0
+    ints: 0
+  }
+  arg {
+    name: "param_grads"
+    strings: "LSTM1/gates_t_w_grad"
+    strings: "LSTM1/gates_t_b_grad"
+  }
+  arg {
+    name: "backward_link_internal"
+    strings: "LSTM1/hidden_t_grad"
+    strings: "LSTM1/hidden_t_prev_grad"
+    strings: "LSTM1/cell_t_grad"
+    strings: "LSTM1/cell_t_prev_grad"
+    strings: "LSTM1/gates_t_grad"
+  }
+  arg {
+    name: "param"
+    ints: 3
+    ints: 4
+  }
+  arg {
+    name: "step_net"
+    s: "name: \"LSTM1\"\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/gates_t_w\"\n  input: \"LSTM1/gates_t_b\"\n  output: \"LSTM1/gates_t\"\n  type: \"FC\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n}\nop {\n  input: \"LSTM1/gates_t\"\n  input: \"input_t\"\n  output: \"LSTM1/gates_t\"\n  type: \"Sum\"\n  device_option {\n    device_type: 1\n  }\n}\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/cell_t_prev\"\n  input: \"LSTM1/gates_t\"\n  input: \"LSTM1/seq_lengths\"\n  input: \"timestep\"\n  output: \"LSTM1/hidden_t\"\n  output: \"LSTM1/cell_t\"\n  type: \"LSTMUnit\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n}\ntype: \"rnn\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM1/hidden_t_prev\"\nexternal_input: \"LSTM1/cell_t_prev\"\nexternal_input: \"LSTM1/gates_t_w\"\nexternal_input: \"LSTM1/gates_t_b\"\nexternal_input: \"LSTM1/seq_lengths\"\nexternal_output: \"LSTM1/hidden_t\"\nexternal_output: \"LSTM1/cell_t\"\n"
+  }
+  arg {
+    name: "backward_step_net"
+    s: "name: \"RecurrentBackwardStep\"\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/cell_t_prev\"\n  input: \"LSTM1/gates_t\"\n  input: \"LSTM1/seq_lengths\"\n  input: \"timestep\"\n  input: \"LSTM1/hidden_t\"\n  input: \"LSTM1/cell_t\"\n  input: \"LSTM1/hidden_t_grad\"\n  input: \"LSTM1/cell_t_grad\"\n  output: \"LSTM1/hidden_t_prev_grad\"\n  output: \"LSTM1/cell_t_prev_grad\"\n  output: \"LSTM1/gates_t_grad\"\n  name: \"\"\n  type: \"LSTMUnitGradient\"\n  arg {\n    name: \"drop_states\"\n    i: 0\n  }\n  arg {\n    name: \"forget_bias\"\n    f: 0\n  }\n  device_option {\n    device_type: 1\n  }\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM1/hidden_t_prev\"\n  input: \"LSTM1/gates_t_w\"\n  input: \"LSTM1/gates_t_grad\"\n  output: \"LSTM1/gates_t_w_grad\"\n  output: \"LSTM1/gates_t_b_grad\"\n  output: \"LSTM1/hidden_t_prev_grad_split\"\n  name: \"\"\n  type: \"FCGradient\"\n  arg {\n    name: \"axis\"\n    i: 2\n  }\n  device_option {\n    device_type: 1\n  }\n  engine: \"CUDNN\"\n  is_gradient_op: true\n}\nop {\n  input: \"LSTM1/hidden_t_prev_grad\"\n  input: \"LSTM1/hidden_t_prev_grad_split\"\n  output: \"LSTM1/hidden_t_prev_grad\"\n  type: \"Sum\"\n}\ntype: \"simple\"\ndevice_option {\n  device_type: 1\n}\nexternal_input: \"LSTM1/gates_t\"\nexternal_input: \"LSTM1/hidden_t_grad\"\nexternal_input: \"LSTM1/cell_t_grad\"\nexternal_input: \"input_t\"\nexternal_input: \"timestep\"\nexternal_input: \"LSTM1/hidden_t_prev\"\nexternal_input: \"LSTM1/cell_t_prev\"\nexternal_input: \"LSTM1/gates_t_w\"\nexternal_input: \"LSTM1/gates_t_b\"\nexternal_input: \"LSTM1/seq_lengths\"\nexternal_input: \"LSTM1/hidden_t\"\nexternal_input: \"LSTM1/cell_t\"\n"
+  }
+  arg {
+    name: "alias_src"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/hidden_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+    strings: "LSTM1/LSTM1/cell_t_prev_states"
+  }
+  arg {
+    name: "initial_recurrent_state_ids"
+    ints: 1
+    ints: 2
+  }
+  is_gradient_op: true
+}
+op {
+  input: "data_transposed"
+  input: "LSTM1/i2h_w"
+  input: "LSTM1/i2h_grad"
+  output: "LSTM1/i2h_w_grad"
+  output: "LSTM1/i2h_b_grad"
+  output: "data_transposed_grad"
+  name: ""
+  type: "FCGradient"
+  is_gradient_op: true
+}
+op {
+  input: "data_transposed_grad"
+  output: "data_grad"
+  name: ""
+  type: "Transpose"
+  arg {
+    name: "axes"
+    ints: 1
+    ints: 0
+    ints: 2
+  }
+  is_gradient_op: true
+}
+op {
+  input: "iter"
+  output: "iter"
+  type: "Iter"
+}
+op {
+  input: "iter"
+  output: "lr"
+  type: "LearningRate"
+  arg {
+    name: "policy"
+    s: "step"
+  }
+  arg {
+    name: "stepsize"
+    i: 438000
+  }
+  arg {
+    name: "base_lr"
+    f: -0.01
+  }
+  arg {
+    name: "gamma"
+    f: 0.9
+  }
+}
+op {
+  input: "LSTM1/i2h_w"
+  input: "LSTM1/i2h_w_moment_1"
+  input: "LSTM1/i2h_w_moment_2"
+  input: "LSTM1/i2h_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/i2h_w"
+  output: "LSTM1/i2h_w_moment_1"
+  output: "LSTM1/i2h_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM1/i2h_b"
+  input: "LSTM1/i2h_b_moment_1"
+  input: "LSTM1/i2h_b_moment_2"
+  input: "LSTM1/i2h_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/i2h_b"
+  output: "LSTM1/i2h_b_moment_1"
+  output: "LSTM1/i2h_b_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM1/hidden_init"
+  input: "LSTM1/hidden_init_moment_1"
+  input: "LSTM1/hidden_init_moment_2"
+  input: "LSTM1/hidden_init_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/hidden_init"
+  output: "LSTM1/hidden_init_moment_1"
+  output: "LSTM1/hidden_init_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM1/cell_init"
+  input: "LSTM1/cell_init_moment_1"
+  input: "LSTM1/cell_init_moment_2"
+  input: "LSTM1/cell_init_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/cell_init"
+  output: "LSTM1/cell_init_moment_1"
+  output: "LSTM1/cell_init_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM1/gates_t_w"
+  input: "LSTM1/gates_t_w_moment_1"
+  input: "LSTM1/gates_t_w_moment_2"
+  input: "LSTM1/gates_t_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/gates_t_w"
+  output: "LSTM1/gates_t_w_moment_1"
+  output: "LSTM1/gates_t_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM1/gates_t_b"
+  input: "LSTM1/gates_t_b_moment_1"
+  input: "LSTM1/gates_t_b_moment_2"
+  input: "LSTM1/gates_t_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM1/gates_t_b"
+  output: "LSTM1/gates_t_b_moment_1"
+  output: "LSTM1/gates_t_b_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/i2h_w"
+  input: "LSTM2/i2h_w_moment_1"
+  input: "LSTM2/i2h_w_moment_2"
+  input: "LSTM2/i2h_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/i2h_w"
+  output: "LSTM2/i2h_w_moment_1"
+  output: "LSTM2/i2h_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/i2h_b"
+  input: "LSTM2/i2h_b_moment_1"
+  input: "LSTM2/i2h_b_moment_2"
+  input: "LSTM2/i2h_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/i2h_b"
+  output: "LSTM2/i2h_b_moment_1"
+  output: "LSTM2/i2h_b_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/hidden_init"
+  input: "LSTM2/hidden_init_moment_1"
+  input: "LSTM2/hidden_init_moment_2"
+  input: "LSTM2/hidden_init_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/hidden_init"
+  output: "LSTM2/hidden_init_moment_1"
+  output: "LSTM2/hidden_init_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/cell_init"
+  input: "LSTM2/cell_init_moment_1"
+  input: "LSTM2/cell_init_moment_2"
+  input: "LSTM2/cell_init_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/cell_init"
+  output: "LSTM2/cell_init_moment_1"
+  output: "LSTM2/cell_init_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/gates_t_w"
+  input: "LSTM2/gates_t_w_moment_1"
+  input: "LSTM2/gates_t_w_moment_2"
+  input: "LSTM2/gates_t_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/gates_t_w"
+  output: "LSTM2/gates_t_w_moment_1"
+  output: "LSTM2/gates_t_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "LSTM2/gates_t_b"
+  input: "LSTM2/gates_t_b_moment_1"
+  input: "LSTM2/gates_t_b_moment_2"
+  input: "LSTM2/gates_t_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "LSTM2/gates_t_b"
+  output: "LSTM2/gates_t_b_moment_1"
+  output: "LSTM2/gates_t_b_moment_2"
+  type: "Adam"
+}
+op {
+  input: "fc1_w"
+  input: "fc1_w_moment_1"
+  input: "fc1_w_moment_2"
+  input: "fc1_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "fc1_w"
+  output: "fc1_w_moment_1"
+  output: "fc1_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "fc1_b"
+  input: "fc1_b_moment_1"
+  input: "fc1_b_moment_2"
+  input: "fc1_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "fc1_b"
+  output: "fc1_b_moment_1"
+  output: "fc1_b_moment_2"
+  type: "Adam"
+}
+op {
+  input: "fc2_w"
+  input: "fc2_w_moment_1"
+  input: "fc2_w_moment_2"
+  input: "fc2_w_grad"
+  input: "lr"
+  input: "iter"
+  output: "fc2_w"
+  output: "fc2_w_moment_1"
+  output: "fc2_w_moment_2"
+  type: "Adam"
+}
+op {
+  input: "fc2_b"
+  input: "fc2_b_moment_1"
+  input: "fc2_b_moment_2"
+  input: "fc2_b_grad"
+  input: "lr"
+  input: "iter"
+  output: "fc2_b"
+  output: "fc2_b_moment_1"
+  output: "fc2_b_moment_2"
+  type: "Adam"
+}
+external_input: "db"
+external_input: "LSTM1/i2h_w"
+external_input: "LSTM1/i2h_b"
+external_input: "LSTM1/gates_t_w"
+external_input: "LSTM1/gates_t_b"
+external_input: "LSTM1/hidden_init"
+external_input: "LSTM1/cell_init"
+external_input: "LSTM2/i2h_w"
+external_input: "LSTM2/i2h_b"
+external_input: "LSTM2/gates_t_w"
+external_input: "LSTM2/gates_t_b"
+external_input: "LSTM2/hidden_init"
+external_input: "LSTM2/cell_init"
+external_input: "fc1_w"
+external_input: "fc1_b"
+external_input: "fc2_w"
+external_input: "fc2_b"
+external_input: "iter"
+external_input: "iter"
+external_input: "LSTM1/i2h_w_moment_1"
+external_input: "LSTM1/i2h_w_moment_2"
+external_input: "LSTM1/i2h_b_moment_1"
+external_input: "LSTM1/i2h_b_moment_2"
+external_input: "LSTM1/hidden_init_moment_1"
+external_input: "LSTM1/hidden_init_moment_2"
+external_input: "LSTM1/cell_init_moment_1"
+external_input: "LSTM1/cell_init_moment_2"
+external_input: "LSTM1/gates_t_w_moment_1"
+external_input: "LSTM1/gates_t_w_moment_2"
+external_input: "LSTM1/gates_t_b_moment_1"
+external_input: "LSTM1/gates_t_b_moment_2"
+external_input: "LSTM2/i2h_w_moment_1"
+external_input: "LSTM2/i2h_w_moment_2"
+external_input: "LSTM2/i2h_b_moment_1"
+external_input: "LSTM2/i2h_b_moment_2"
+external_input: "LSTM2/hidden_init_moment_1"
+external_input: "LSTM2/hidden_init_moment_2"
+external_input: "LSTM2/cell_init_moment_1"
+external_input: "LSTM2/cell_init_moment_2"
+external_input: "LSTM2/gates_t_w_moment_1"
+external_input: "LSTM2/gates_t_w_moment_2"
+external_input: "LSTM2/gates_t_b_moment_1"
+external_input: "LSTM2/gates_t_b_moment_2"
+external_input: "fc1_w_moment_1"
+external_input: "fc1_w_moment_2"
+external_input: "fc1_b_moment_1"
+external_input: "fc1_b_moment_2"
+external_input: "fc2_w_moment_1"
+external_input: "fc2_w_moment_2"
+external_input: "fc2_b_moment_1"
+external_input: "fc2_b_moment_2"
