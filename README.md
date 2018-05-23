@@ -14,13 +14,6 @@ Computer Vision has become a reliable way of prediction after deep learning prev
 4.Mining fitness status on physical examination and motion data,
 We will also mining data provided by users to detect potential fitness problem or reveal healthy status. 
 
-### Build everything
-Build everything with command
-```Bash
-make
-```
-The project strongly relies on functions provided from [Caffe2](https://github.com/caffe2/caffe2) and [Caffe2 C++ helper](https://github.com/breadbread1984/caffe2_cpp_tutorial) . So you need to install these libraries to compile tools in this repo.
-
 ### Components
 1.Prediction of diseases and traits directly from raw DNA sequence.
 
