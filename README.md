@@ -37,6 +37,7 @@ You can train a classifier on polymorphic alleles.
 3.Medical appliation based on visual clues.
 
 (1)visual/facial: classification based on facial images:
+(2)visual/iris: biometric identification and illness detection according to visual information from iris.
 
 You can train a classifier with train_facial_classifier. The dataset generation tools will be released soon.
 
